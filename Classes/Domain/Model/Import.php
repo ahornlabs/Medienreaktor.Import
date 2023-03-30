@@ -146,9 +146,9 @@ class Import
      */
     public function flush()
     {
-        unset($this->data);
-        unset($this->parentNodeIdentifier);
-        unset($this->targetNodeType);
-        unset($this->targetWorkspace);
+        $this->data = null;
+        $this->parentNodeIdentifier = null;
+        $this->targetNodeType = null;
+        $this->targetWorkspace = null;
     }
 }
