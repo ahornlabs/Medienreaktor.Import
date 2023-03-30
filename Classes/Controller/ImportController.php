@@ -4,10 +4,12 @@ namespace Medienreaktor\Import\Controller;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\ContentRepository\Domain\Model\NodeTemplate;
+use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Error\Messages\Message;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ActionController;
+use Neos\Neos\Domain\Service\UserService;
 
 /**
  * Controller for import module
@@ -26,6 +28,18 @@ class ImportController extends ActionController
      * @var ContextFactoryInterface
      */
     protected $contextFactory;
+
+    /**
+     * @Flow\Inject
+     * @var WorkspaceRepository
+     */
+    protected $workspaceRepository;
+
+    /**
+     * @Flow\Inject
+     * @var UserService
+     */
+    protected $userService;
 
     /**
      * @Flow\Inject
@@ -48,7 +62,17 @@ class ImportController extends ActionController
                 $nodeTypeOptions[$nodeType->getName()] = $nodeType->getName();
             }
         }
+
+        $workspaces = [];
+        foreach ($this->workspaceRepository->findAll() as $workspace) {
+            if (!$workspace->isPersonalWorkspace() && ($workspace->isInternalWorkspace() || $this->userService->currentUserCanManageWorkspace($workspace))) {
+                $workspaces[$workspace->getName()] = $workspace->getTitle();
+            }
+        }
+
         $this->view->assign('nodeTypes', $nodeTypeOptions);
+        $this->view->assign('workspaces', $workspaces);
+
     }
 
     /**
