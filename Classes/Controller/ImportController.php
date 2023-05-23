@@ -164,6 +164,12 @@ class ImportController extends ActionController
                     if ($node->getNodeType()->getPropertyType($mapping[$i]) === 'reference') {
                         $refNode = $q->find($col)->get(0);
                         $node->setProperty($mapping[$i], $refNode);
+                    } elseif ($node->getNodeType()->getPropertyType($mapping[$i]) === 'DateTime') {
+                        $node->setProperty($mapping[$i], [
+                            "date" => $col, 
+                            "timezone" => "UTC", 
+                            "dateFormat" => "Y-m-d"
+                        ]);
                     } else {
                         $node->setProperty($mapping[$i], $col);
                     }
